@@ -1,5 +1,4 @@
 from typing import Any
-from xml.dom.minidom import Element
 
 
 class Dictionary:
@@ -52,7 +51,8 @@ class Dictionary:
         if key is None:
             raise KeyError
         index = self.get_index(key, self.capacity)
-        while self.table[index][0] is not None and self.table[index][0] != self.DELETED:
+        while (self.table[index][0] is not None
+               and self.table[index][0] != self.DELETED):
             if self.table[index][0] == key:
                 self.size -= 1
                 break
@@ -77,30 +77,10 @@ class Dictionary:
     def del_index(self, index: int) -> None:
         self.table[index][0] = self.DELETED
         self.table[index][1] = None
-        self.table[index][2] =None
+        self.table[index][2] = None
         self.size -= 1
 
     def __delitem__(self, key: Any) -> None:
         index = self.get_index(key, self.capacity)
         index = self.find_key(index, key)
         self.del_index(index)
-
-#
-# items = [(f"Element {i}", i) for i in range(10)]
-# dictionary = Dictionary()
-# for key, value in items[0:3]:
-#     dictionary[key] = value
-#     print(dictionary[key])
-# for key, value in items[0:3]:
-#     del dictionary[key]
-# items[0] = ("Element 0", "!!!!!!")
-# for key, value in items[4:10]:
-#     dictionary[key] = value
-#
-# print(dictionary)
-# # for key, value in items:
-# #     assert dictionary[key] == value
-# # assert len(dictionary) == len(items)
-# # for key, value in items:
-# #     del dictionary[key]
-# print(len(dictionary))
