@@ -1,12 +1,14 @@
 from typing import Any
+from xml.dom.minidom import Element
 
 
 class Dictionary:
     def __init__(self, capacity: int = 8) -> None:
+        self.DELETED = object()
         self.capacity = capacity
         self.size = 0
         self.table: list[list[Any]] = \
-            [[None, None] for _ in range(self.capacity)]
+            [[None, None, None] for _ in range(self.capacity)]
         self.threshold = 2 / 3
 
     @staticmethod
@@ -22,7 +24,7 @@ class Dictionary:
         return index
 
     def __clear_table__(self) -> None:
-        self.table = [[None, None] for _ in range(self.capacity)]
+        self.table = [[None, None, None] for _ in range(self.capacity)]
         self.size = 0
 
     def clear(self) -> None:
@@ -30,12 +32,12 @@ class Dictionary:
 
     def __extend_table__(self) -> None:
         temptable = []
-        for key, value in self.table:
-            if key is not None:
-                temptable.append([key, value])
+        for key, value, hash_val in self.table:
+            if key is not None and key != self.DELETED:
+                temptable.append([key, value, hash_val])
         self.capacity *= 2
         self.__clear_table__()
-        for key, value in temptable:
+        for key, value, hash_val in temptable:
             self.__setitem__(key, value)
 
     def __len__(self) -> int:
@@ -50,7 +52,7 @@ class Dictionary:
         if key is None:
             raise KeyError
         index = self.get_index(key, self.capacity)
-        while self.table[index][0] is not None:
+        while self.table[index][0] is not None and self.table[index][0] != self.DELETED:
             if self.table[index][0] == key:
                 self.size -= 1
                 break
@@ -58,6 +60,7 @@ class Dictionary:
             if index == self.capacity:
                 index = 0
 
+        self.table[index][2] = hash(key)
         self.table[index][1] = value
         self.table[index][0] = key
         self.size += 1
@@ -72,11 +75,32 @@ class Dictionary:
         return value
 
     def del_index(self, index: int) -> None:
-        self.table[index][0] = None
+        self.table[index][0] = self.DELETED
         self.table[index][1] = None
+        self.table[index][2] =None
         self.size -= 1
 
     def __delitem__(self, key: Any) -> None:
         index = self.get_index(key, self.capacity)
         index = self.find_key(index, key)
         self.del_index(index)
+
+#
+# items = [(f"Element {i}", i) for i in range(10)]
+# dictionary = Dictionary()
+# for key, value in items[0:3]:
+#     dictionary[key] = value
+#     print(dictionary[key])
+# for key, value in items[0:3]:
+#     del dictionary[key]
+# items[0] = ("Element 0", "!!!!!!")
+# for key, value in items[4:10]:
+#     dictionary[key] = value
+#
+# print(dictionary)
+# # for key, value in items:
+# #     assert dictionary[key] == value
+# # assert len(dictionary) == len(items)
+# # for key, value in items:
+# #     del dictionary[key]
+# print(len(dictionary))
