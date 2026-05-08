@@ -5,7 +5,7 @@ class Dictionary:
     def __init__(self, capacity: int = 8) -> None:
         self.DELETED = object()
         self.capacity = capacity
-        self.size = 0
+        self.length = 0
         self.table: list[list[Any]] = \
             [[None, None, None] for _ in range(self.capacity)]
         self.threshold = 2 / 3
@@ -24,7 +24,7 @@ class Dictionary:
 
     def __clear_table__(self) -> None:
         self.table = [[None, None, None] for _ in range(self.capacity)]
-        self.size = 0
+        self.length = 0
 
     def clear(self) -> None:
         self.__clear_table__()
@@ -40,7 +40,7 @@ class Dictionary:
             self.__setitem__(key, value)
 
     def __len__(self) -> int:
-        return self.size
+        return self.length
 
     def __getitem__(self, key: Any) -> Any:
         index = self.get_index(key, self.capacity)
@@ -54,7 +54,7 @@ class Dictionary:
         while (self.table[index][0] is not None
                and self.table[index][0] != self.DELETED):
             if self.table[index][0] == key:
-                self.size -= 1
+                self.length -= 1
                 break
             index += 1
             if index == self.capacity:
@@ -63,8 +63,8 @@ class Dictionary:
         self.table[index][2] = hash(key)
         self.table[index][1] = value
         self.table[index][0] = key
-        self.size += 1
-        if self.size >= self.capacity * self.threshold:
+        self.length += 1
+        if self.length >= self.capacity * self.threshold:
             self.__extend_table__()
 
     def get(self, key: Any, return_is_none: Any = None) -> Any:
@@ -78,7 +78,7 @@ class Dictionary:
         self.table[index][0] = self.DELETED
         self.table[index][1] = None
         self.table[index][2] = None
-        self.size -= 1
+        self.length -= 1
 
     def __delitem__(self, key: Any) -> None:
         index = self.get_index(key, self.capacity)
